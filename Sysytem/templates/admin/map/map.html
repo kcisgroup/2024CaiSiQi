@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" charset=UTF-8">
+    <link rel="stylesheet" href="../../../static/css/index.css">
+    <link rel="stylesheet" href="../../../static/css/mark.css">
+    <script src="../../../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+    <script src="../../../static/js/index_left.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <title>...</title>
+    <style>
+<!--        html, body {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            height: 100%; /* 让页面高度占满整个视口 */-->
+<!--        }-->
+
+<!--        body {-->
+<!--            display: flex; /* 使用 flex 布局 */-->
+<!--            justify-content: center; /* 水平居中 */-->
+<!--            align-items: center; /* 垂直居中 */-->
+<!--            overflow: hidden; /* 防止图片溢出屏幕 */-->
+<!--        }-->
+
+<!--        img {-->
+<!--            width: 100vw; /* 图片宽度占满屏幕的100% */-->
+<!--            height: 100vh; /* 图片高度占满屏幕的100% */-->
+<!--            object-fit: cover; /* 让图片铺满容器，保持比例，并截取溢出部分 */-->
+<!--        }-->
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+
+<!--<body>-->
+<!--    <div id="main">-->
+<!--        <img id="img" src="../../../static/img/201中心站1.jpg" class="pin img" easypin-id="image_1"/>-->
+<!--        <div style="display:none;">-->
+<!--            <popover>-->
+<!--                <div class="Container">-->
+<!--                    <div class="popBackground borderRadius"></div>-->
+<!--                    <div class="popBody">-->
+<!--                        <div class="arrow-down" style="top: 185px;left: -19px;"></div>-->
+<!--                        <div class="font1"><h1>{[设备名称]}</h1></div>-->
+<!--                        <div class="popHeadLine"></div>-->
+<!--                        <div class="popContent">-->
+<!--                            <label class="popfont">资产编码：</label><br>-->
+<!--                            <input id="asset_code" type="text" class="popInput" value="{[资产编码]}" readonly/><br>-->
+
+<!--                            <label class="popfont">设备名称：</label><br>-->
+<!--                            <input id="name" type="text" class="popInput" value="{[设备名称]}"/><br>-->
+
+<!--                            <label class="popfont">位置：</label><br>-->
+
+<!--                            <label class="popfont" style="left: 25px">经度：</label>-->
+<!--                            <input id="lng" type="text" class="popInput1" value="{[longitude]}"/><br>-->
+
+<!--                            <label class="popfont" style="left: 25px">纬度：</label>-->
+<!--                            <input id="lat" type="text" class="popInput1" value="{[latitude]}"/><br>-->
+
+<!--                            <label class="popfont">同类型总数量：</label>-->
+<!--                            <input id="num" type="text" class="popInput1" value="{[同类型总数量]}" style="position: relative;right: 25px;width: 50px"><br>-->
+
+<!--                            <label class="popfont">存放安装地点：</label><br>-->
+<!--                            <input id="storeadd" type="text" class="popInput" value="{[存放安装地点]}"/><br>-->
+
+<!--                            <label class="popfont">其他描述/取值范围：</label><br>-->
+<!--                            <textarea id="description" type="text" class="popInput2">{[其他描述/取值范围]}</textarea><br>-->
+
+<!--                            <div><input id="changeInfo" type="button" onclick="changeInfo(this)" class="btn" value="修改"/></div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </popover>-->
+
+<!--            <marker>-->
+<!--                <div class="marker">&nbsp;&nbsp;</div>-->
+<!--            </marker>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--<script src="../../../static/js/easy_pin/jquery.easing.min.js"></script>-->
+<!--<script src="../../../static/js/easy_pin/jquery.easypin.min.js"></script>-->
+<!--<script src="../../../static/js/picmark1.js"></script>-->
+<!--<script src="../../../static/js/changeinfo.js"></script>-->
+<!--</body>-->
+
+<body>
+
+        <div id="main">
+            <div class="demo">
+                <div>
+                    <img id="img" src="/static/img/201中心站1.jpg" class="pin img" easypin-id="image_1"/>
+                </div>
+                <div style="display:none;" easypin-tpl>
+                    <popover>
+                        <div class="Container">
+                            <div class="popBackground borderRadius"></div>
+                            <div class="popBody">
+                                <div class="arrow-down" style="top: 185px;left: -19px;"></div>
+                                <div class="font1"><h1>{[设备名称]}</h1></div>
+                                <div class="popHeadLine"></div>
+                                <div class="popContent">
+                                    <label class="popfont">资产编码：</label><br>
+                                    <input id="asset_code" type="text" class="popInput" value="{[资产编码]}" readonly/><br>
+
+                                    <label class="popfont">设备名称：</label><br>
+                                    <input id="name" type="text" class="popInput" value="{[设备名称]}"/><br>
+
+                                    <label class="popfont">位置：</label><br>
+
+                                    <label class="popfont" style="left: 25px">经度：</label>
+                                    <input id="lng" type="text" class="popInput1" value="{[longitude]}"/><br>
+
+                                    <label class="popfont" style="left: 25px">纬度：</label>
+                                    <input id="lat" type="text" class="popInput1" value="{[latitude]}"/><br>
+
+                                    <label class="popfont">同类型总数量：</label>
+                                    <input id="num" type="text" class="popInput1" value="{[同类型总数量]}" style="position: relative;right: 25px;width: 50px"><br>
+
+                                    <label class="popfont">存放安装地点：</label><br>
+                                    <input id="storeadd" type="text" class="popInput" value="{[存放安装地点]}"/><br>
+
+                                    <label class="popfont">其他描述/取值范围：</label><br>
+
+                                    <textarea id="description" type="text" class="popInput2">{[其他描述/取值范围]}</textarea><br>
+
+                                    <div><input id="changeInfo" type="button" onclick="changeInfo(this)" class="btn" value="修改"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </popover>
+
+                    <marker>
+                        <div class="marker">&nbsp;&nbsp;</div>
+                    </marker>
+                </div>
+            </div>
+        </div>
+        <script src="/static/js/easy_pin/jquery.easing.min.js"></script>
+        <script src="/static/js/easy_pin/jquery.easypin.min.js"></script>
+        <script src="/static/js/picmark1.js"></script>
+        <script src="/static/js/changeinfo.js"></script>
+
+<script src="/static/js/drag.js"></script>
+</body>
+
+</html>

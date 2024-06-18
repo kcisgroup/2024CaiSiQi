@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tableexport/5.2.0/tableexport.min.js"></script>
+    <meta http-equiv="content-type" charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../../static/css/index.css">
+    <link rel="stylesheet" href="../../../static/css/mark.css">
+    <script src="../../../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+    <script src="../../../static/js/index_left.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+    <title>...</title>
+    {% include 'admin/common/header.html' %}
+    <style>
+        .container {
+            text-align: center;
+        }
+        .multi-table {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 10px;
+            border-collapse: separate;
+            border-spacing: 50px;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        body {
+            color: #747474;
+            background-color: white;
+        }
+        button {
+            background-color: #5FB878;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            font-size: 12px;
+            margin: 0px 2px 50px 0px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition-duration: 0.4s; /* 过渡效果持续时间 */
+<!--            margin-top: 50px; /* 设置按钮与上方元素之间的上边距 */-->
+            margin-bottom: 50px; /* 设置按钮与下方元素之间的下边距 */
+        }
+        button:hover {
+            background-color: #45a049; /* 鼠标悬停时改变背景颜色 */
+        }
+
+    </style>
+</head>
+
+<body class="pear-container">
+<div id="topRows" class="topRows">
+<!--    <div id="footer1" class="footer1">-->
+        <div class="container">
+            <div class="layui-row">
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" style="height:100px; line-height: 100px; font-size: 14px; color: #747474;">建设清单</div>
+                        <div class="layui-card-body">
+                            <table id='multi-table' class="multi-table">
+                                <thead>
+                                    <tr style="width: 150px; text-align: center;">
+                                        <th><input id='js-all-checkbox' type='checkbox' lay-filter='checkAll(this)'></th>
+                                        <th style="width: 200px; text-align: center;">存放安装地点</th>
+                                        <th style="width: 180px; text-align: center;">场站类型</th>
+                                        <th style="width: 180px; text-align: center;">设备类型</th>
+                                        <th style="width: 80px; text-align: center;">资产编码</th>
+                                        <th style="width: 100px; text-align: center;">设备名称</th>
+                                        <th style="width: 100px; text-align: center;">数量</th>
+                                        <th style="width: 160px; text-align: center;">取值范围</th>
+                                        <th style="width: 50px; text-align: center;">单位</th>
+                                        <th>原值</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody"></tbody>
+                            </table>
+                        </div>
+                        <button id="downloadButton1">下载</button>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-card">
+                        <div class="layui-card-header" style="height:100px; line-height: 100px; font-size: 14px; color: #747474;">资产清单</div>
+                        <div class="layui-card-body">
+                            <table id='multi-table2' class="multi-table">
+                                <thead>
+                                    <tr>
+                                        <th>资产编码</th>
+                                        <th>设备名称</th>
+                                        <th>数量</th>
+                                        <th>取值范围</th>
+                                        <th>存放地点</th>
+                                        <th>场站类型</th>
+                                        <th>设备类型</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody1"></tbody>
+                            </table>
+                        </div>
+                        <button id="downloadButton2">下载</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--    </div>-->
+</div>
+
+<script>
+// Function to convert table to CSV format
+function convertTableToCSV(tableId) {
+    let table = document.getElementById(tableId);
+
+    if (!table) {
+        console.error("Table element not found.");
+        return;
+    }
+
+    let headerRow = table.querySelector('thead tr'); // 查询表头行
+    if (!headerRow) {
+        console.error("Table header row not found.");
+        return;
+    }
+
+    let headerCols = headerRow.querySelectorAll('th');
+
+    let csv = [];
+
+    // Extract column names from the table header
+    let headerData = Array.from(headerCols).map(col => col.innerText.trim());
+    headerData = headerData.slice(1);
+    console.log(headerData)
+    csv.push(headerData.join(','));
+
+    // Extract table data from rows
+    let rows = table.querySelectorAll('tbody tr');
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll('td');
+
+        // Skip the first cell (checkbox or empty)
+        for (let j = 1; j < cols.length; j++) {
+            row.push(cols[j].innerText.trim());
+        }
+
+        csv.push(row.join(','));
+    }
+
+    return csv.join('\n');
+}
+
+function convertTableToCSV2(tableId) {
+    let table = document.getElementById(tableId);
+
+    if (!table) {
+        console.error("Table element not found.");
+        return;
+    }
+
+    let headerRow = table.querySelector('thead tr'); // 查询表头行
+    if (!headerRow) {
+        console.error("Table header row not found.");
+        return;
+    }
+
+    let headerCols = headerRow.querySelectorAll('th');
+
+    let csv = [];
+
+    // Extract column names from the table header
+    let headerData = Array.from(headerCols).map(col => col.innerText.trim());
+    console.log(headerData)
+    csv.push(headerData.join(','));
+
+    // Extract table data from rows
+    let rows = table.querySelectorAll('tbody tr');
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll('td');
+
+        // Skip the first cell (checkbox or empty)
+        for (let j = 0; j < cols.length; j++) {
+            row.push(cols[j].innerText.trim());
+        }
+
+        csv.push(row.join(','));
+    }
+
+    return csv.join('\n');
+}
+
+// Function to trigger download
+function downloadCSV(content, filename) {
+    let blob = new Blob([content], { type: 'text/csv' });
+    let link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+}
+
+// Event listener for downloadButton1
+document.getElementById('downloadButton1').addEventListener('click', function() {
+    let csvContent = convertTableToCSV('multi-table');
+    if (csvContent) {
+        downloadCSV(csvContent, '建设清单.csv');
+    }
+});
+
+// Event listener for downloadButton1
+document.getElementById('downloadButton2').addEventListener('click', function() {
+    let csvContent = convertTableToCSV2('multi-table2');
+    if (csvContent) {
+        downloadCSV(csvContent, '资产清单.csv');
+    }
+});
+
+</script>
+
+</body>
+
+</html>

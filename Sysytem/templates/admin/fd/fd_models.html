@@ -1,0 +1,1175 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--        {% include 'admin/common/header.html' %}-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>欺诈检测模型选择</title>-->
+<!--    <style>-->
+<!--    </style>-->
+
+<!--</head>-->
+<!--<body>-->
+<!--  <div class="layui-form-item">-->
+<!--      <label  class="layui-btn-group">选择欺诈检测模型</label><br/>-->
+
+<!--      <p style="position: absolute; left: 30%; top: 60px;"><strong>&nbsp可解释模型</strong></p>-->
+<!--      <button class="layui-btn" id="btn0" style="position: absolute; left: 30%; top: 120px;">FSFD-TLKG</button><br/>-->
+<!--      <button class="layui-btn" id="btn1" style="position: absolute; left: 30%; top: 210px;">RuleList</button><br/>-->
+<!--      <button class="layui-btn" id="btn2" style="position: absolute; left: 30%; top: 300px;">Skoperules</button><br>-->
+<!--      <button class="layui-btn" id="btn3" style="position: absolute; left: 30%; top: 390px;">EBM</button><br/>-->
+<!--      <button class="layui-btn" id="btn4" style="position: absolute; left: 30%; top: 480px;">DecisionTree</button><br/>-->
+<!--      <button class="layui-btn" id="btn5" style="position: absolute; left: 30%; top: 570px;">LogisticRegression</button><br/>-->
+<!--      <button class="layui-btn" id="btn6" style="position: absolute; left: 30%; top: 660px;">GaussianNaiveBayes</button><br/>-->
+
+<!--      <p style="position: absolute; left: 60%; top: 60px;"><strong>&nbsp不可解释模型</strong></p>-->
+<!--      <button class="layui-btn" id="btn7" style="position: absolute; left: 60%; top: 100px;">XGBoost</button><br/>-->
+<!--      <button class="layui-btn" id="btn8" style="position: absolute; left: 60%; top: 170px;">CatBoost</button><br/>-->
+<!--      <button class="layui-btn" id="btn9" style="position: absolute; left: 60%; top: 240px;">AdaBoost</button><br/>-->
+<!--      <button class="layui-btn" id="btn10" style="position: absolute; left: 60%; top: 310px;">LightGBM</button><br/>-->
+<!--      <button class="layui-btn" id="btn11" style="position: absolute; left: 60%; top: 380px;">BaggingClassifier</button><br/>-->
+<!--      <button class="layui-btn" id="btn12" style="position: absolute; left: 60%; top: 450px;">VotingClassifier</button><br/>-->
+<!--      <button class="layui-btn" id="btn13" style="position: absolute; left: 60%; top: 520px;">RandomForest</button><br/>-->
+<!--      <button class="layui-btn" id="btn14" style="position: absolute; left: 60%; top: 590px;">LinearSVC</button><br/>-->
+<!--      <button class="layui-btn" id="btn15" style="position: absolute; left: 60%; top: 660px;">MLP</button><br/>-->
+<!--      <button class="layui-btn" id="btn16" style="position: absolute; left: 60%; top: 730px;">RNN</button><br/>-->
+<!--      <button class="layui-btn" id="btn17" style="position: absolute; left: 60%; top: 800px;">GNN</button>-->
+<!--  </div>-->
+
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型选择</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+  }
+
+  .model-group {
+    flex-grow: 1;
+  }
+
+  h2 {
+    font: Arial;
+    text-align: center;
+    margin-top: 500px;
+    font-size: 1.1em; /* 增加标题字体大小 */
+    color: #333; /* 调整标题颜色 */
+    padding-bottom: 100px; /* 增加下边框和标题之间的间距 */
+    margin-top: 200px; /* 调整标题与按钮之间的间距 */
+  }
+
+  .model-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 40px;
+    margin-left: 70px;
+  }
+
+  .model-item {
+    margin-bottom: 20px;
+  }
+
+  .model-btn {
+    display: block;
+    height: 50px;
+    width: 80%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    text-align: center;
+    color: #ffffff;
+    background-color: #5FB878;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .model-btn:hover {
+    background-color: #45a049;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="model-group">
+    <h2>可解释模型</h2>
+    <ul class="model-list">
+      <li class="model-item"><button class="model-btn" id="btn0">FSFD-TLKG</button></li>
+<!--      <li class="model-item"><button class="model-btn" id="btn1">RuleList</button></li>-->
+      <li class="model-item"><button class="model-btn" id="btn2">Skoperules</button></li>
+      <li class="model-item"><button class="model-btn" id="btn3">EBM</button></li>
+      <li class="model-item"><button class="model-btn" id="btn4">DecisionTree</button></li>
+      <li class="model-item"><button class="model-btn" id="btn5">LogisticRegression</button></li>
+      <li class="model-item"><button class="model-btn" id="btn6">GaussianNaiveBayes</button></li>
+    </ul>
+  </div>
+
+  <div class="model-group">
+    <h2>不可解释模型</h2>
+    <ul class="model-list">
+      <li class="model-item"><button class="model-btn" id="btn7">XGBoost</button></li>
+      <li class="model-item"><button class="model-btn" id="btn8">CatBoost</button></li>
+      <li class="model-item"><button class="model-btn" id="btn9">AdaBoost</button></li>
+      <li class="model-item"><button class="model-btn" id="btn10">LightGBM</button></li>
+      <li class="model-item"><button class="model-btn" id="btn11">BaggingClassifier</button></li>
+      <li class="model-item"><button class="model-btn" id="btn12">VotingClassifier</button></li>
+      <li class="model-item"><button class="model-btn" id="btn13">RandomForest</button></li>
+      <li class="model-item"><button class="model-btn" id="btn14">LinearSVC</button></li>
+      <li class="model-item"><button class="model-btn" id="btn15">MLP</button></li>
+      <li class="model-item"><button class="model-btn" id="btn16">RNN</button></li>
+      <li class="model-item"><button class="model-btn" id="btn17">GNN</button></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--<meta charset="UTF-8">-->
+<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--<title>模型选择</title>-->
+<!--<style>-->
+<!--    body, html {-->
+<!--    height: 100%;-->
+<!--    margin: 0;-->
+<!--    padding: 0;-->
+<!--    display: flex;-->
+<!--    justify-content: center;-->
+<!--    align-items: center;-->
+<!--  }-->
+
+<!--    .container {-->
+<!--    display: flex;-->
+<!--    height: 100%;-->
+<!--    justify-content: center;-->
+<!--    align-items: center;-->
+<!--  }-->
+
+<!--  .model-group {-->
+<!--    flex-grow: 1;-->
+<!--    border: 1px solid #000; /* 可选，添加边框 */-->
+<!--    box-sizing: border-box; /* 可选，使边框尺寸包含在内 */-->
+<!--    margin: 0 10px; /* 在左右两侧添加空白间隔 */-->
+<!--    border-radius: 20px; /* 设置圆角半径 */-->
+<!--  }-->
+
+<!--  h2 {-->
+<!--    text-align: center;-->
+<!--    margin-bottom: 20px;-->
+<!--    font-size: 1.5em; /* 增加标题字体大小 */-->
+<!--    color: #333; /* 调整标题颜色 */-->
+<!--    padding-bottom: 10px; /* 增加下边框和标题之间的间距 */-->
+<!--    margin-top: 20px; /* 调整标题与按钮之间的间距 */-->
+<!--  }-->
+
+<!--  .model-list {-->
+<!--    list-style-type: none;-->
+<!--    padding: 0;-->
+<!--  }-->
+
+<!--  .model-item {-->
+<!--    margin-bottom: 10px;-->
+<!--  }-->
+
+<!--  .model-btn {-->
+<!--    display: block;-->
+<!--    width: 100%;-->
+<!--    padding: 10px 15px;-->
+<!--    border: 1px solid #ccc;-->
+<!--    border-radius: 5px;-->
+<!--    text-align: center;-->
+<!--    background-color: #f9f9f9;-->
+<!--    cursor: pointer;-->
+<!--    transition: background-color 0.3s ease;-->
+<!--    white-space: nowrap; /* 防止换行 */-->
+<!--    overflow: hidden; /* 隐藏溢出部分 */-->
+<!--    text-overflow: ellipsis; /* 显示省略号 */-->
+<!--  }-->
+
+<!--  .model-btn:hover {-->
+<!--    background-color: #e0e0e0;-->
+<!--  }-->
+<!--</style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--  <div class="model-group">-->
+<!--    <h2>可解释模型</h2>-->
+<!--    <ul class="model-list">-->
+<!--      <li class="model-item"><button class="model-btn" id="btn0">FSFD-TLKG</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn1">RuleList</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn2">Skoperules</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn3">EBM</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn4">DecisionTree</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn5">LogisticRegression</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn6">GaussianNaiveBayes</button></li>-->
+<!--    </ul>-->
+<!--  </div>-->
+
+<!--  <div class="model-group">-->
+<!--    <h2>不可解释模型</h2>-->
+<!--    <ul class="model-list">-->
+<!--      <li class="model-item"><button class="model-btn" id="btn7">XGBoost</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn8">CatBoost</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn9">AdaBoost</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn10">LightGBM</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn11">BaggingClassifier</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn12">VotingClassifier</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn13">RandomForest</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn14">LinearSVC</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn15">MLP</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn16">RNN</button></li>-->
+<!--      <li class="model-item"><button class="model-btn" id="btn17">GNN</button></li>-->
+<!--    </ul>-->
+<!--  </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+  {% include 'admin/common/header.html' %}
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/layui/2.5.6/layui.min.js"></script>
+  <script>
+    layui.use(['form','layer','table','jquery'],function () {
+      let layer = layui.layer
+      let form = layui.form
+
+      $('#btn0').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'FSFD-TLKG',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form0" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form0)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              $.ajax({
+                url: '/fd/fd_models/submit_form0',
+                type: 'GET',
+                data: mydata,
+                contentType: 'application/json',
+                xhrFields: { withCredentials: true},
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'FSFD-TLKG',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+
+<!--      $('#btn1').on('click',function(){-->
+<!--        layer.open(-->
+<!--          {-->
+<!--            type:1,-->
+<!--            title:'RuleList',-->
+<!--            content:`-->
+<!--              <form class="layui-form">-->
+<!--              <br>-->
+<!--              <br>-->
+<!--                <div>-->
+<!--                  <div class="layui-input-block">-->
+<!--                    <button class="layui-btn" lay-submit lay-filter="form1" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>-->
+<!--                    <p>-&#45;&#45;&#45;&#45;请耐心等待结果页面弹出-&#45;&#45;&#45;&#45;</p>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              <form>-->
+<!--            `,-->
+<!--            area:['400px','220px']-->
+<!--          },-->
+<!--          layui.form.on('submit(form1)',function(data){-->
+<!--              let myobj = localStorage.getItem('myobj');-->
+<!--              let mydata = JSON.parse(myobj);-->
+<!--              console.log('bbbb:',mydata)-->
+
+<!--              $.ajax({-->
+<!--                url: '/fd/fd_models/submit_form1',-->
+<!--                type: 'GET',-->
+<!--                data: mydata,  // data是将数据传给后端的-->
+<!--                contentType: 'application/json',-->
+<!--                xhrFields: {-->
+<!--                          withCredentials: true-->
+<!--                          },-->
+<!--                success: function (res) {-->
+<!--                          res = res.replace(/\n/g, '<br>');-->
+<!--                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';-->
+<!--                          layer.open({-->
+<!--                              title:'RuleList',-->
+<!--                              content:res,-->
+<!--                              area: ['400px', '320px'],-->
+<!--                          });-->
+<!--                      },  // success是将数据传递给页面的-->
+<!--                error: function () {-->
+<!--                          layer.msg('表单0提交失败');-->
+<!--                      },-->
+<!--              })-->
+<!--              return false-->
+<!--            }-->
+<!--          )-->
+<!--        )-->
+<!--      })-->
+
+
+      $('#btn2').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'Skope-rules',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form2" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form2)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form2',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'Skope-rules',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+
+      $('#btn3').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'EBM',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form3" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form3)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form3',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'EBM',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn4').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'DecisionTree',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form4" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form4)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form4',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'DecisionTree',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn5').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'LogisticRegression',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form5" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form5)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form5',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'LogisticRegression',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn6').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'GaussianNaiveBayes',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form6" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form6)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form6',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'GaussianNaiveBayes',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn7').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'XGBoost',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form7" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form7)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form7',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'XGBoost',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn8').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'CatBoost',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form8" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form8)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form8',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'CatBoost',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn9').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'AdaBoost',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form9" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form9)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form9',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'AdaBoost',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn10').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'LightGBM',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form10" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form10)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form10',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'LightGBM',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn11').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'BaggingClassifier',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form11" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form11)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form11',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'BaggingClassifier',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn12').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'VotingClassifier',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form12" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form12)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form12',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'VotingClassifier',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn13').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'RandomForest',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form13" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form13)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form13',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'RandomForest',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn14').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'LinearSVC',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form14" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form14)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form14',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'LinearSVC',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn15').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'MLP',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form15" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form15)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form15',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'MLP',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn16').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'RNN',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form16" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form16)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form16',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'RNN',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+      $('#btn17').on('click',function(){
+        layer.open(
+          {
+            type:1,
+            title:'GNN',
+            content:`
+              <form class="layui-form">
+              <br>
+              <br>
+                <div>
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="form17" style="position: absolute; left: 20%; top: 60px; background-color: #5FB878;">检测{{myname}}</button>
+                    <p>-----请耐心等待结果页面弹出-----</p>
+                  </div>
+                </div>
+              <form>
+            `,
+            area:['400px','220px']
+          },
+          layui.form.on('submit(form17)',function(data){
+              let myobj = localStorage.getItem('myobj');
+              let mydata = JSON.parse(myobj);
+              console.log('bbbb:',mydata)
+
+              $.ajax({
+                url: '/fd/fd_models/submit_form17',
+                type: 'GET',
+                data: mydata,  // data是将数据传给后端的
+                contentType: 'application/json',
+                xhrFields: {
+                          withCredentials: true
+                          },
+                success: function (res) {
+                          res = res.replace(/\n/g, '<br>');
+                          res = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' + res + '</div>';
+                          layer.open({
+                              title:'GNN',
+                              content:res,
+                              area: ['400px', '320px'],
+                          });
+                      },  // success是将数据传递给页面的
+                error: function () {
+                          layer.msg('表单0提交失败');
+                      },
+              })
+              return false
+            }
+          )
+        )
+      })
+
+    })
+
+</script>
+
+</body>
+</html>

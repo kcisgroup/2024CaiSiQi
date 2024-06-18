@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <title>修改财务报表信息</title>
+    {% include 'admin/common/header.html' %}
+</head>
+<body class="pear-container">
+<form class="layui-form">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+                <div class="layui-form-item" style="display:none">
+                    <div class="layui-input-block">
+                        <input type="text" name="id" lay-verify="title" autocomplete="off" placeholder="请输入表格id"
+                               class="layui-input" value="{{user.id}}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">表格名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" lay-verify="title" autocomplete="off" placeholder="请输入表格名称"
+                               class="layui-input" value="{{user.name}}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">样本总数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="all_num" lay-verify="title" autocomplete="off" placeholder="请输入样本总数"
+                               class="layui-input" value="{{user.all_num}}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">欺诈样本</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="fraud_num" lay-verify="title" autocomplete="off" placeholder="请输入欺诈样本数量"
+                               class="layui-input" value="{{user.fraud_num}}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">非欺诈样本</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="nonfraud_num" lay-verify="title" autocomplete="off" placeholder="请输入非欺诈样本数量"
+                               class="layui-input" value="{{user.nonfraud_num}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="user-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+
+
+{% include 'admin/common/footer.html' %}
+<script>
+  layui.use(['form', 'jquery'], function() {
+    let form = layui.form;
+    let $ = layui.jquery;
+    form.on('submit(user-save)', function(data) {
+      $.ajax({
+        url: '/api/v1/fs/fs/' + data.field.id,
+        data: JSON.stringify(data.field),
+        dataType: 'json',
+        contentType: 'application/json',
+        type: 'put',
+        success: function(result) {
+          if (result.success) {
+            layer.msg(result.message, {icon: 1, time: 1000}, function() {
+              parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+              parent.layui.table.reload('tables');
+            });
+          } else {
+            layer.msg(result.message, {icon: 2, time: 1000});
+          }
+        },
+      });
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

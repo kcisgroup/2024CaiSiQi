@@ -1,0 +1,100 @@
+.container {
+    display: flex;
+    height: 600px;
+    margin: auto;
+    padding-right: 10px;
+}
+
+.left {
+    position: relative;
+    height: 800px;
+}
+
+.left .resize {
+    width: 600px;
+    min-width: 350px;
+    max-width: 880px;
+    resize: horizontal;
+    overflow: scroll;
+    height: inherit;
+    opacity: 0;
+}
+
+.resize::-webkit-scrollbar {
+    width: 200px;
+    height: inherit;
+}
+
+.left .bar-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: inherit;
+    border-right: 2px solid #eee;
+    border-left: 1px solid #bbb;
+    pointer-events: none;
+}
+
+.content {
+    position: absolute;
+    top: 0;
+    /*right: 5px;*/
+    /*bottom: 0;*/
+    /*left: 0;*/
+    box-sizing: border-box;
+    z-index: 0;
+    overflow-x: hidden;
+}
+
+.right {
+    width: 200px;
+    flex: 1;
+    background: #eee;
+    height: 800px;
+}
+
+.resize:hover ~ .bar-btn,
+.resize:active ~ .bar-btn {
+    border-left: 2px dashed #848484;
+}
+
+.topRows {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.footer1 {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+
+/* 分割线 */
+.expander {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background-color: #a5a5a5;
+}
+
+.expander:hover {
+    cursor: n-resize;
+}
+
+/* 下半部分 */
+.bottomRows {
+    /*text-align: center;*/
+    height: 500px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+
+
+
+

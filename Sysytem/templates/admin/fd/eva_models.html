@@ -1,0 +1,213 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    {% include 'admin/common/header.html' %}-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>财务报表欺诈检测结果可视化</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash;  <div class="layui-form-item">&ndash;&gt;-->
+<!--&lt;!&ndash;      <label  class="layui-btn-group">查看结果</label><br/>&ndash;&gt;-->
+<!--&lt;!&ndash;      <button class="layui-btn" id="btn0" style="display: block; margin: 100px auto;">点击查看不同的特征选择方法对欺诈检测结果的影响</button><br/>&ndash;&gt;-->
+<!--&lt;!&ndash;      <button class="layui-btn" id="btn1" style="display: block; margin: 100px auto;">点击查看不同的规则提取方法对欺诈检测结果的影响</button><br/>&ndash;&gt;-->
+
+<!--&lt;!&ndash;      <div class="layui-card">&ndash;&gt;-->
+<!--&lt;!&ndash;       <div class="layui-card-header"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;       <div class="layui-card-body">&ndash;&gt;-->
+<!--&lt;!&ndash;           <div id="EchartZhu" style="width: 500px;height: 500px;"> </div>&ndash;&gt;-->
+<!--&lt;!&ndash;       </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;   </div>&ndash;&gt;-->
+
+<!--<div class="layui-form-item" style="text-align: center;">-->
+<!--    <label class="layui-btn-group">查看结果</label><br/>-->
+<!--    <button class="layui-btn" id="btn0" style="margin: 20px;">点击查看不同的特征选择方法对欺诈检测结果的影响</button><br/>-->
+<!--    <button class="layui-btn" id="btn1" style="margin: 20px;">点击查看不同的规则提取方法对欺诈检测结果的影响</button><br/>-->
+
+<!--    <div class="layui-card" style="width: 500px; margin: 20px auto;">-->
+<!--        <div class="layui-card-header"></div>-->
+<!--        <div class="layui-card-body">-->
+<!--            <div id="EchartZhu" style="width: 100%; height: 300px;"></div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Selection and Rule Extraction</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.5.6/css/layui.css">
+    <style>
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: #5FB878;
+            position: relative;
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        .circle:hover {
+            background-color: #4CAF50; /* 设置鼠标移动时的背景颜色 */
+        }
+
+        .circle-text {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .button-container {
+            position: absolute;
+            width: 200px; /* 设置按钮宽度为200px */
+            height: 100px; /* 设置按钮高度为100px */
+            left: 50%; /* 让按钮水平居中 */
+            transform: translateX(-50%);
+            bottom: -60px; /* 调整按钮位置，负值为上移，正值为下移 */
+        }
+
+        .button-container:nth-child(odd) {
+            bottom: auto; /* 重置按钮位置 */
+            top: 240px; /* 第一个按钮距离圆形的距离 */
+        }
+
+        .button-container:nth-child(even) {
+            bottom: auto; /* 重置按钮位置 */
+            top: 240px; /* 第二个按钮距离圆形的距离 */
+        }
+
+        .layui-btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .button-container .layui-btn {
+            height: 80px;
+            line-height: 1.8;
+            background-color: #5FB878;
+        }
+
+        .button-container .layui-btn:hover {
+            background-color: #4CAF50; /* 设置鼠标移动时的背景颜色 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="circle-container">
+        <div class="circle">
+            <svg class="layui-icon-user" style="font-size: 60px;">
+                <text x="50%" y="50%" fill="white" font-size="16" text-anchor="middle">特征选择</text>
+            </svg>
+            <div class="button-container">
+                <button class="layui-btn" id="btn0">不同的特征选择方法<br>对欺诈检测结果的影响</button>
+            </div>
+        </div>
+        <div class="circle">
+            <svg class="layui-icon-star" style="font-size: 60px;">
+                <text x="50%" y="50%" fill="white" font-size="16" text-anchor="middle">规则提取</text>
+            </svg>
+            <div class="button-container">
+                <button class="layui-btn" id="btn1">不同的规则提取方法<br>对欺诈检测结果的影响</button>
+            </div>
+        </div>
+    </div>
+
+    {% include 'admin/common/header.html' %}
+<!--    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+<!--    <script src="https://cdn.staticfile.org/layui/2.5.6/layui.min.js"></script>-->
+<!--    <script>-->
+<!--    layui.config({base:'/static/admin/component/pear/module/'}).use(['jquery', 'form', 'layer',  'table','upload', 'element', 'echarts', 'carousel'], function () {-->
+<!--        let $ = layui.jquery;-->
+<!--        let element = layui.element;-->
+<!--        let table = layui.table-->
+<!--        let form = layui.form-->
+<!--        let carousel = layui.carousel;-->
+<!--        let echarts = layui.echarts;-->
+
+<!--        //弹出窗设置 自己设置弹出百分比-->
+<!--        function screen () {-->
+<!--            if (typeof width !== 'number' || width === 0) {-->
+<!--                width = $(window).width()*0.8-100-->
+<!--            }-->
+<!--            if (typeof height !== 'number' || height === 0) {-->
+<!--                height = $(window).height()*0.8-80-->
+<!--            }-->
+<!--            return [width + 'px', height + 'px']-->
+<!--        }-->
+
+<!--        // 初始化echarts实例：未指定配置项-->
+<!--        let chartZhu = echarts.init(document.getElementById('EchartZhu'));-->
+<!--        // 指定图表配置项和数据:初始化一个空对象-->
+<!--        let optionchart = {};-->
+<!--        chartZhu.setOption(optionchart, true);  // 合并新的配置项-->
+
+<!--        $('#btn0').on('click',  function() {-->
+<!--          layer.open({-->
+<!--            title:'不同的特征选择方法对欺诈检测结果的影响',-->
+<!--            shade: 0.1,-->
+<!--            btn:['确认'],-->
+<!--            area: screen(),-->
+<!--            content: '<img src ="../../static/upload/feature_selection.png" style="max-width:100%;max-height:100%;">'-->
+<!--          })-->
+<!--        })-->
+
+<!--        $('#btn1').on('click',  function() {-->
+<!--          layer.open({-->
+<!--            title:'不同的规则提取方法对欺诈检测结果的影响',-->
+<!--            shade: 0.1,-->
+<!--            btn:['确认'],-->
+<!--            area: screen(),-->
+<!--            content: '<img src ="../../static/upload/different_methods.png" style="max-width:100%;max-height:100%;">'-->
+<!--          })-->
+<!--        })-->
+<!--    });-->
+
+<!--</script>-->
+    <!-- 将原始的 layui、jQuery、echarts 的引用放到头部 -->
+    <script src="https://cdn.staticfile.org/layui/2.5.6/layui.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        layui.config({base:'/static/admin/component/pear/module/'}).use(['jquery', 'form', 'layer',  'table','upload', 'element', 'echarts', 'carousel'], function () {
+            let $ = layui.jquery;
+            let layer = layui.layer;
+
+            $('#btn0').on('click', function() {
+                layer.open({
+                    title:'不同的特征选择方法对欺诈检测结果的影响',
+                    shade: 0.1,
+                    btn:['确认'],
+                    area: ['100%', '100%'], // 修改为百分比，以适应不同屏幕尺寸
+                    content: '<img src ="../../static/upload/feature_selection.png" style="max-width:100%;max-height:100%;">'
+                });
+            });
+
+            $('#btn1').on('click', function() {
+                layer.open({
+                    title:'不同的规则提取方法对欺诈检测结果的影响',
+                    shade: 0.1,
+                    btn:['确认'],
+                    area: ['100%', '100%'], // 修改为百分比，以适应不同屏幕尺寸
+                    content: '<img src ="../../static/upload/different_methods.png" style="max-width:100%;max-height:100%;">'
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

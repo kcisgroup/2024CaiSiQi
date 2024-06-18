@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <title>财务报表管理</title>
+    {% include 'admin/common/header.html' %}
+    <link rel="stylesheet" href="/static/admin/admin/css/other/user.css"/>
+</head>
+<body class="pear-container">
+
+
+{# 查询表单 #}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="" lay-filter="user-query-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">文件名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" placeholder="" class="layui-input">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="user-query">
+                    <i class="layui-icon layui-icon-search"></i>
+                    查询
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# 用户表格 #}
+<div class="user-main user-collasped">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table id="tables" lay-filter="tables"></table>
+        </div>
+    </div>
+</div>
+
+
+{% include 'admin/common/footer.html' %}
+{# 用户修改操作 #}
+<script type="text/html" id="tool">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="tool-fdmodels">
+        <i class="pear-icon pear-icon-search"></i>
+    </button>
+    <button class="pear-btn pear-btn-normal pear-btn-sm" lay-event="tool-rulemodels" id="btnrule">
+        <i class="pear-icon pear-icon-menu"></i>
+    </button>
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="tool-evamodels">
+        <i class="pear-icon pear-icon-picture"></i>
+    </button>
+</script>
+
+<!--{# 启动与禁用 #}-->
+<!--<script type="text/html" id="tool-switch">-->
+<!--    <input type="checkbox" name="enable" value="{{ "{{ d.id }}" }}" lay-skin="switch" lay-text="启用|禁用"-->
+<!--           lay-filter="tool-switch"-->
+<!--            {{ "{{# if(d.enable==1){ }} checked {{# } }}" }} />-->
+<!--</script>-->
+
+{# 用户注册时间 #}
+<script type="text/html" id="user-createTime">
+    {{ '  {{layui.util.toDateString(d.create_at,  "yyyy-MM-dd HH:mm:ss")}' |safe }}}
+</script>
+
+{# 用户更新时间 #}
+<script type="text/html" id="user-updateTime">
+    {{ '  {{layui.util.toDateString(d.update_at,  "yyyy-MM-dd HH:mm:ss")}' |safe }}}
+</script>
+
+<script>
+  layui.use(['table', 'dtree', 'form', 'jquery', 'popup', 'common', 'layer'], function() {
+    let table = layui.table;
+    let form = layui.form;
+    let $ = layui.jquery;
+    let dtree = layui.dtree;
+    let popup = layui.popup;
+    let common = layui.common;
+    let layer = layui.layer;
+
+    // 表格数据
+    const get_columns = () => [
+      [
+        {type: 'checkbox'},
+        {title: '文件名称', field: 'name', align: 'center'},
+        {title: '文件大小', field: 'size', align: 'center'},
+        {title: '创建时间', field: 'create_at', templet: '#user-createTime', align: 'center'},
+        {title: '操作', toolbar: '#tool', align: 'center'},
+      ],
+    ];
+
+    // 渲染表格数据
+    table.render({
+      parseData: parserTableData,
+      elem: '#tables',
+      url: '/api/v1/fd/fd',  /* 将静态数据渲染到表格中，路径是从flask routes中得到的 */
+      page: true,
+      cols: get_columns(),
+      skin: 'line',
+      height: 'full-148',
+      toolbar: '#toolbar', /*工具栏*/
+      text: {none: '暂无人员信息'},
+      defaultToolbar: [{layEvent: 'refresh', icon: 'layui-icon-refresh'}, 'filter', 'print', 'exports'], /*默认工具栏*/
+    });
+
+    // 菜单栏渲染
+    dtree.on('node(\'dept-tree\')', function(obj) {
+      let field = form.val('user-query-form'); /*用户账号查询*/
+      field.deptId = obj.param.nodeId;
+      window.refresh(field);
+    });
+
+    $('.user-group').click(function() {
+      let group = $(this).attr('user-group');
+      let field = form.val('user-query-form');
+      if (group === '-1') {
+        field.deptId = group;
+        $(this).removeClass('button-default');
+        $(this).prev().removeClass('button-primary');
+        $(this).prev().addClass('button-default');
+        $(this).addClass('button-primary');
+      } else {
+        field.deptId = group;
+        $(this).removeClass('button-default');
+        $(this).next().removeClass('button-primary');
+        $(this).next().addClass('button-default');
+        $(this).addClass('button-primary');
+      }
+      window.refresh(field);
+    });
+
+    table.on('tool(tables)', function (obj) {
+      if (obj.event === 'tool-fdmodels') {
+        window.tool_fdmodels(obj)
+      } else if (obj.event === 'tool-rulemodels') {
+        window.tool_rulemodels(obj)
+      } else if (obj.event === 'tool-evamodels') {
+        window.tool_evamodels(obj)
+      } else if (obj.event === 'refresh') {
+        window.refresh()
+      }
+    })
+
+    form.on('submit(user-query)', function(data) {
+      window.refresh(data.field);
+      return false;
+    });
+
+    // 欺诈检测2
+    window.tool_fdmodels = function(obj) {
+    let myobj = obj.data
+    localStorage.setItem('myobj', JSON.stringify(myobj));
+    console.log(myobj)
+
+    layer.open({
+      type: 2,
+      title: '选择欺诈检测模型',
+      shade: 0.1,
+      content: '/fd/fd_models/'+obj.data['id'],
+      maxmin: false,
+      resize:true,
+      fixed:true,
+      btn:['确认','取消'],
+<!--      area: ['2500px', '1180px']  /* 宽、高 */-->
+      area: ['1000px', '1000px']
+    });
+   };
+
+    window.tool_rulemodels = function(obj) {
+      layer.open({
+        type: 2,
+        title: '挖掘财务报表欺诈规则',
+        shade: 0.1,
+        content: '/fd/rule_models/'+obj.data['id'],
+        maxmin: false,
+        resize:true,
+        fixed:true,
+        btn:['确认','取消'],
+        area: ['1600px', '800px']  /* 宽、高 */
+      });
+   };
+
+   // 可视化实验结果2
+    window.tool_evamodels = function(obj) {
+      layer.open({
+        type: 2,
+        title: '可视化财务报表欺诈检测结果',
+        shade: 0.1,
+        content: '/fd/eva_models/'+obj.data['id'],
+        maxmin: false,
+        resize:true,
+        fixed:true,
+        btn:['确认','取消'],
+        area: ['700px', '700px'],  /* 宽、高 */
+        scrollbar: false,
+        success: function(layero, index){
+            $(layero).css('overflow', 'hidden'); /* 内容溢出时的显示方式 */
+            $('body').css('overflow', 'hidden');  /* 隐藏浏览器的滚动条 */
+        },
+        end: function(index, layero) {
+            $('body').css('overflow', 'auto');  /* 恢复浏览器的滚动条 */
+        }
+      });
+   };
+
+    window.refresh = function(param) {
+      table.reload('tables', {where: param});
+    };
+
+  });
+</script>
+</body>
+</html>

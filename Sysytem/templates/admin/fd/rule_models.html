@@ -1,0 +1,118 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    {% include 'admin/common/header.html' %}-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>挖掘财务报表欺诈规则</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--  <div class="layui-form-item">-->
+<!--      <label  class="layui-btn-group">查看规则</label><br/>-->
+<!--      <button class="layui-btn" id="btnrule" style="display: block; margin: 30px auto;">点击生成规则</button><br/>-->
+<!--  </div>-->
+<!--  {% include 'admin/common/header.html' %}-->
+<!--  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+<!--  <script src="https://cdn.staticfile.org/layui/2.5.6/layui.min.js"></script>-->
+<!--<script>-->
+<!--    layui.use(['form','layer','table','jquery'],function () {-->
+<!--      let layer = layui.layer-->
+<!--      let form = layui.form-->
+
+<!--      $('#btnrule').on('click',function(){-->
+<!--          let myobj = localStorage.getItem('myobj');-->
+<!--          let mydata = JSON.parse(myobj);-->
+
+<!--          $.ajax({-->
+<!--              url: '/fd/rule_models/allrules',-->
+<!--              type: 'GET',-->
+<!--              data: mydata,  // data是将数据传给后端的-->
+<!--              contentType: 'application/json',-->
+<!--              xhrFields: {-->
+<!--                  withCredentials: true-->
+<!--              },-->
+<!--              success: function (res) {-->
+<!--                    res = res.replace(/\n/g, '<br>');-->
+<!--                    layer.open({-->
+<!--                          area: ['700px', '600px'],-->
+<!--                          title:'examples of mined rules',-->
+<!--                          content:res-->
+<!--                          });-->
+<!--              },  // success是将数据传递给页面的-->
+<!--              error: function () {-->
+<!--                  layer.msg('表单0提交失败');-->
+<!--              },-->
+<!--          })-->
+<!--      })-->
+<!--    })-->
+
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'admin/common/header.html' %}
+    <meta charset="UTF-8">
+    <title>挖掘财务报表欺诈规则</title>
+</head>
+<body>
+  <div class="layui-form-item">
+      <label  class="layui-btn-group">查看规则</label><br/>
+      <!-- 移除按钮 -->
+  </div>
+  {% include 'admin/common/header.html' %}
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/layui/2.5.6/layui.min.js"></script>
+<script>
+    layui.use(['form','layer','table','jquery'],function () {
+      let layer = layui.layer
+      let form = layui.form
+
+      // 当页面加载完成时执行以下代码
+      $(document).ready(function() {
+          generateRules(); // 调用生成规则的函数
+      });
+
+      function generateRules() {
+          let myobj = localStorage.getItem('myobj');
+          let mydata = JSON.parse(myobj);
+
+          $.ajax({
+              url: '/fd/rule_models/allrules',
+              type: 'GET',
+              data: mydata,
+              contentType: 'application/json',
+              xhrFields: {
+                  withCredentials: true
+              },
+              success: function (res) {
+                    res = res.replace(/\n/g, '<br>');
+                    // 将 res 内容分割为每行规则的列表
+                    let rulesList = res.split('\n');
+
+                    // 生成规则列表的 HTML 代码
+                    let htmlContent = '<div style="padding: 20px; font-size: 16px; line-height: 3;">';
+                    htmlContent += '<ul style="list-style-type: none; padding-left: 0;">'; // 设置无序列表样式
+                    rulesList.forEach(function(rule) {
+                        htmlContent += '<li>' + rule + '</li>'; // 将每行规则添加为列表项
+                    });
+                    htmlContent += '</ul>';
+                    htmlContent += '</div>';
+
+                    layer.open({
+                          area: ['1600px', '800px'],
+                          title:'examples of mined rules',
+                          content:htmlContent
+                          });
+              },
+              error: function () {
+                  layer.msg('表单0提交失败');
+              },
+          });
+      }
+    });
+</script>
+</body>
+</html>
