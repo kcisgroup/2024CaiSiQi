@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="container"></div>
+<script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+<script src="../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+<script>
+    G6.registerNode('tree-node', {
+            drawShape: function drawShape(cfg, group) {
+                const rect = group.addShape('rect', {
+                    attrs: {
+                        fill: '#fff',
+                        stroke: '#666',
+                        x: 0,
+                        y: 0,
+                        width: 1,
+                        height: 1
+                    },
+                    name: 'rect-shape',
+                });
+                const content = cfg.name.replace(/(.{19})/g, '$1\n');//正则
+                const text = group.addShape('text', {
+                    attrs: {
+                        text: content,
+                        x: 0,
+                        y: 0,
+                        textAlign: 'left',
+                        textBaseline: 'middle',
+                        fill: '#666',
+                    },
+                    name: 'text-shape',
+                });
+                const bbox = text.getBBox();
+                // const hasChildren = cfg.children && cfg.children.length > 0;
+                rect.attr({
+                    x: -bbox.width / 2 - 4,
+                    y: -bbox.height / 2 - 6,
+                    width: bbox.width + 12,
+                    height: bbox.height + 12,
+                });
+                text.attr({
+                    x: -bbox.width / 2 + 3,
+                    y: 0
+                });
+                return rect;
+            },
+        },
+        'single-node',
+    );
+    G6.registerEdge('flow-line', {
+        draw(cfg, group) {
+            const startPoint = cfg.startPoint;
+            const endPoint = cfg.endPoint;
+            const shape = group.addShape('path', {
+                attrs: {
+                    stroke: '#666',
+                    endArrow: true,
+                    path: [
+                        ['M', startPoint.x, startPoint.y],
+                        ['L', endPoint.x / 3 + (2 / 3) * startPoint.x, startPoint.y], // 三分之一处
+                        ['L', endPoint.x / 3 + (2 / 3) * startPoint.x, endPoint.y], // 三分之二处
+                        ['L', endPoint.x, endPoint.y],
+                    ],
+                },
+            });
+            return shape;
+        },
+    });
+
+    const container = document.getElementById('container');
+    const width = container.scrollWidth;
+    const height = container.scrollHeight || 500;
+    const graph = new G6.TreeGraph({
+        container: 'container',
+        width,
+        height,
+        modes: {
+            default: [
+                {
+                    type: 'collapse-expand',
+                },
+                'click-select',
+                'drag-canvas',
+                'zoom-canvas',
+            ],
+        },
+        nodeStateStyles: {
+            selected: {
+                stroke: '#bb8080',
+                lineWidth: 3
+            }
+        },
+        defaultNode: {
+            type: 'tree-node',
+            anchorPoints: [
+                [0, 0.5],
+                [1, 0.5],
+            ],
+        },
+        defaultEdge: {
+            type: 'flow-line',
+        },
+        layout: {
+            type: 'compactBox',
+            direction: 'LR',
+            getId: function getId(d) {
+                return d.id;
+            },
+            getName: function getName(d) {
+                return d.name;
+            },
+            getHeight: function getHeight() {
+                return 16;
+            },
+            getWidth: function getWidth() {
+                return 16;
+            },
+            getVGap: function getVGap() {
+                return 15;
+            },
+            getHGap: function getHGap() {
+                return 100;
+            },
+        },
+    });
+
+    graph.on('node:click', (e) => {
+        const nodeItem = e.item // 获取被点击的节点元素对象
+        console.log(nodeItem._cfg);
+        console.log(nodeItem._cfg.parent._cfg.model.name);
+        console.log(nodeItem._cfg.model.name);
+        var name = nodeItem._cfg.model.name;
+        var parent = nodeItem._cfg.parent._cfg.model.name;
+        var pparent = nodeItem._cfg.parent._cfg.parent._cfg.model.name;
+        $.ajax({
+            url: '/select',
+            data: {
+                name: name,
+                parent: parent,
+                pparent: pparent
+            },
+            dataType: 'JSON',
+            type: 'GET',
+            success: function (data) {
+                console.log(data)
+                console.log("success")
+            //     setInterval(function (){
+            //         $(".left").load(location.href+".left");
+            // },3000);
+                // window.parent.location.reload();
+            }
+        });
+    });
+
+    fetch('../static/js/atlas.json')
+        .then((res) => res.json())
+        .then((data) => {
+            // console.log(data);
+            //深度优先遍历树数据从根节点到叶子节点的由上至下的深度优先遍历树数据。
+            G6.Util.traverseTree(data, function (item) {
+                item.id = data.id;
+                // console.log(item)
+                // item.name=data.name;
+            });
+            graph.data(data);
+            graph.render();
+            graph.fitView();
+        });
+
+    if (typeof window !== 'undefined')
+        window.onresize = () => {
+            if (!graph || graph.get('destroyed')) return;
+            if (!container || !container.scrollWidth || !container.scrollHeight) return;
+            graph.changeSize(container.scrollWidth, container.scrollHeight);
+        };
+</script>
+</body>
+</html>

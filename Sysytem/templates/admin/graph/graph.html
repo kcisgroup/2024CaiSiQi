@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script src="../../../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+    <link rel="stylesheet" href="/static/admin/admin/css/other/user.css"/>
+    <title>...</title>
+    <style>
+        /* 定义一个用于居中元素的样式 */
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh; /* 设置高度为视口的高度，以垂直居中 */
+        }
+        /* 定义节点框的样式 */
+        .node-shape {
+            fill: #ffffff;
+            stroke: #555555;
+            radius: 8; /* 圆角大小调整 */
+            lineWidth: 2; /* 边框宽度调整 */
+            shadowColor: #999999;
+            shadowBlur: 10;
+            shadowOffsetX: 3;
+            shadowOffsetY: 3;
+        }
+
+        /* 定义选中节点的样式 */
+        .node-selected {
+            fill: #ff8888; /* 选中节点填充色调整 */
+            stroke: #ff0000; /* 选中节点边框颜色调整 */
+            lineWidth: 3; /* 选中节点边框宽度调整 */
+            shadowColor: #ff0000; /* 选中节点阴影颜色调整 */
+            shadowBlur: 20; /* 选中节点阴影模糊度调整 */
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="user-query-form">
+                <div class="layui-form-item">
+                    <label style="display: block; text-align: center; font-weight: bold;">请选择需要处理的设备名称</label>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="topRows1" class="topRows">
+        <div id="footer2" class="footer1">
+            <div id="container" class="center">
+                <script>
+                    G6.registerNode('custom-node', {
+                        drawShape: function drawShape(cfg, group) {
+                            const content = cfg.name; // 获取节点的文字内容
+                            const textSize = G6.Util.getTextSize(content, 24); // 获取文字的大小
+                            const width = Math.max(textSize[0] + 50, 100); // 计算节点框的宽度，加上一定的边距
+                            const height = Math.max(textSize[1] + 30, 65); // 计算节点框的高度，加上一定的边距
+
+                            // 自定义节点图形样式，根据计算得到的宽度和高度设置节点框的大小和背景颜色
+                            const shape = group.addShape('rect', {
+                                attrs: {
+                                    x: -width / 2, // 计算节点框左上角 x 坐标
+                                    y: -height / 2, // 计算节点框左上角 y 坐标
+                                    width: width, // 设置节点框的宽度
+                                    height: height, // 设置节点框的高度
+                                    fill: '#5FB878', //
+                                    radius: 10, // 圆角
+                                    stroke: '#ffffff', // 边框颜色
+                                    lineWidth: 1, // 边框宽度
+                                },
+                                name: 'rect-shape',
+                            });
+
+                            // 添加节点文字
+                            group.addShape('text', {
+                                attrs: {
+                                    text: content,
+                                    x: 0,
+                                    y: 0,
+                                    textAlign: 'center',
+                                    textBaseline: 'middle',
+                                    fill: '#333333',
+                                    fontSize: 24,
+                                    fontFamily: 'Arial', // 设置字体样式
+                                },
+                                name: 'text-shape',
+                            });
+                            return shape;
+                        },
+                    });
+
+                    const container = document.getElementById('container');
+                    const width = container.scrollWidth;
+                    const height = container.scrollHeight || 500;
+                    const graph = new G6.TreeGraph({
+                        container: 'container',
+                        width,
+                        height,
+                        modes: {
+                            default: [
+                                {
+                                    type: 'collapse-expand',
+                                },
+                                'click-select',
+                                'drag-canvas',
+                                'zoom-canvas',
+                            ],
+                        },
+                        defaultNode: {
+                            type: 'custom-node',
+                        },
+                        defaultEdge: {
+                            type: 'line',
+                            style: {
+                                stroke: '#333333',
+                                lineWidth: 1,
+                                endArrow: false,
+                            },
+                        },
+                        layout: {
+                            type: 'compactBox',
+                            direction: 'LR', // 树的布局：自上而下TB
+                            getId: function getId(d) {
+                                return d.id;
+                            },
+                            getHeight: function getHeight(d) {
+                                const content = d.name; // 获取节点的文字内容
+                                const textSize = G6.Util.getTextSize(content, 24); // 获取文字的大小
+                                return textSize[1] + 6; // 返回节点框的高度，加上一定的边距
+                            },
+                            getWidth: function getWidth(d) {
+                                const content = d.name; // 获取节点的文字内容
+                                const textSize = G6.Util.getTextSize(content, 24); // 获取文字的大小
+                                return textSize[0] + 20; // 返回节点框的宽度，加上一定的边距
+                            },
+                            getVGap: function getVGap() {
+                                return 25; // 调整垂直间距
+                            },
+                            getHGap: function getHGap() {
+                                return 320; // 调整水平间距
+                            },
+                        },
+                    });
+
+                    // 监听节点的鼠标悬停事件
+                    graph.on('node:mouseenter', (e) => {
+                        const item = e.item; // 获取当前触发事件的节点元素对象
+                        const shape = item.get('group').find((shape) => shape.get('name') === 'rect-shape'); // 获取节点的形状对象
+                        shape.attr('fill', '#EDEFE5'); // 修改节点的填充颜色为悬停状态下的颜色
+                    });
+
+                    // 监听节点的鼠标离开事件
+                    graph.on('node:mouseleave', (e) => {
+                        const item = e.item; // 获取当前触发事件的节点元素对象
+                        const shape = item.get('group').find((shape) => shape.get('name') === 'rect-shape'); // 获取节点的形状对象
+                        shape.attr('fill', '#5FB878'); // 恢复节点的填充颜色为默认颜色
+                    });
+
+                    graph.on('node:click', (e) => {
+                        const nodeItem = e.item; // 获取被点击的节点元素对象
+                        var name = (nodeItem._cfg.model.name).split(' ')[0];
+                        var parent = nodeItem._cfg.parent._cfg.model.name;
+                        var pparent = nodeItem._cfg.parent._cfg.parent._cfg.model.name;
+                        console.log(name)
+                        console.log(parent)
+                        console.log(pparent)
+                        $.ajax({
+                            url: '/select',
+                            data: {
+                                name: name,
+                                parent: parent,
+                                pparent: pparent
+                            },
+                            dataType: 'JSON',
+                            contentType: 'application/json; charset=UTF-8',
+                            type: 'GET',
+                            success: function (data) {
+                                console.log(data)
+                                console.log("success")
+                            }
+                        });
+                    });
+
+                    fetch('../../../static/js/atlas.json')
+                        .then((res) => res.json())
+                        .then((data) => {
+                            G6.Util.traverseTree(data, function (item) {
+                                item.id = data.id;
+                            });
+                            graph.data(data);
+                            graph.render();
+                            graph.fitView();
+                        });
+
+                    if (typeof window !== 'undefined')
+                        window.onresize = () => {
+                            if (!graph || graph.get('destroyed')) return;
+                            if (!container || !container.scrollWidth || !container.scrollHeight) return;
+                            graph.changeSize(container.scrollWidth, container.scrollHeight);
+                        };
+                </script>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

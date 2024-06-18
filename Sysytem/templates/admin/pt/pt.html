@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" charset=UTF-8">
+    <link rel="stylesheet" href="../../../static/css/index.css">
+    <link rel="stylesheet" href="../../../static/css/mark.css">
+    <script src="../../../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+    <script src="../../../static/js/index_left.js"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script src="../../../static/js/easy_pin/jquery-2.2.0.min.js"></script>
+    <title>...</title>
+</head>
+
+<body>
+    <div id="topRows1" class="topRows">
+        <div id="footer2" class="footer1">
+            <div class="container" id="container">
+                <script>
+                    G6.registerNode('tree-node', {
+                        drawShape: function drawShape(cfg, group) {
+                            // 结点边框
+                            const rect = group.addShape('rect', {
+                                attrs: {
+                                    fill: '#fff',
+                                    stroke: '#333',
+                                    lineWidth: 1,
+                                    x: 0,
+                                    y: 0,
+                                },
+                                name: 'rect-shape',
+                            });
+                            const content = cfg.name.replace(/(.{19})/g, '$1\n');//正则
+                            // 结点中的文字
+                            const text = group.addShape('text', {
+                                attrs: {
+                                    text: content,
+                                    x: 0,
+                                    y: 0,
+                                    textAlign: 'left',
+                                    textBaseline: 'middle',
+                                    fill: '#333',
+                                    fontSize: 18,
+                                },
+                                name: 'text-shape',
+                            });
+                            const bbox = text.getBBox();
+                            rect.attr({
+                                x: -bbox.width / 2 - 4,
+                                y: -bbox.height / 2 - 6,
+                                width: bbox.width + 12,
+                                height: bbox.height + 12,
+                            });
+                            text.attr({
+                                x: -bbox.width / 2 + 3,
+                                y: 0
+                            });
+                            return rect;
+                        },
+                    },
+                    'single-node',
+                );
+<!--                    G6.registerEdge('flow-line', {-->
+<!--                        draw(cfg, group) {-->
+<!--                            const startPoint = cfg.startPoint;-->
+<!--                            const endPoint = cfg.endPoint;-->
+<!--                            const shape = group.addShape('path', {-->
+<!--                                attrs: {-->
+<!--                                    stroke: '#333',-->
+<!--                                    endArrow: false,-->
+<!--                                    path: [-->
+<!--                                        ['M', startPoint.x, startPoint.y],-->
+<!--                                        ['L', endPoint.x / 3 + (2 / 3) * startPoint.x, startPoint.y], // 三分之一处-->
+<!--                                        ['L', endPoint.x / 3 + (2 / 3) * startPoint.x, endPoint.y], // 三分之二处-->
+<!--                                        ['L', endPoint.x, endPoint.y],-->
+<!--                                    ],-->
+<!--                                },-->
+<!--                            });-->
+<!--                            return shape;-->
+<!--                        },-->
+<!--                    });-->
+
+                    const container = document.getElementById('container');
+                    const width = container.scrollWidth;
+                    const height = container.scrollHeight || 500;
+                    const graph = new G6.TreeGraph({
+                        container: 'container',
+                        width,
+                        height,
+                        modes: {
+                            default: [
+                                {
+                                    type: 'collapse-expand',
+                                },
+                                'click-select',
+                                'drag-canvas',
+                                'zoom-canvas',
+                            ],
+                        },
+                        nodeStateStyles: {
+                            selected: {
+                                stroke: '#bb8080',
+                                lineWidth: 1,
+                            }
+                        },
+                        defaultNode: {
+                            type: 'tree-node',
+                            anchorPoints: [
+                                <!-- 横向的树 -->
+<!--                                [0, 0.5],-->
+<!--                                [1, 0.5],-->
+                                <!-- 纵向的树 -->
+                                [0.5, 0],
+                                [0.5, 1]
+                            ],
+                        },
+                        defaultEdge: {
+                            type: 'line',
+                            style: {
+                                stroke: '#333',
+                                endArrow: false,
+                            },
+                        },
+                        layout: {
+                            type: 'compactBox',
+                            direction: 'TB',  // 树的布局：自上而下
+                            getId: function getId(d) {
+                                return d.id;
+                            },
+                            getName: function getName(d) {
+                                return d.name;
+                            },
+                            getHeight: function getHeight() {
+                                return 8;
+                            },
+                            getWidth: function getWidth() {
+                                return 8;
+                            },
+                            getVGap: function getVGap() {
+                                return 120;  // 调整结点垂直间距
+                            },
+                            getHGap: function getHGap() {
+                                return 70;  // 调整结点水平间距
+                            },
+                        },
+                    });
+
+                    graph.on('node:click', (e) => {
+                        const nodeItem = e.item // 获取被点击的节点元素对象
+                        var name = (nodeItem._cfg.model.name).split(' ')[0];
+                        var parent = nodeItem._cfg.parent._cfg.model.name;
+                        var pparent = nodeItem._cfg.parent._cfg.parent._cfg.model.name;
+                        console.log(name)
+                        console.log(parent)
+                        console.log(pparent)
+                        $.ajax({
+                            url: '/select',
+                            data:{
+                                name: name,
+                                parent: parent,
+                                pparent: pparent
+                            },
+                            dataType: 'JSON',
+                            contentType:'application/json; charset=UTF-8',
+                            type: 'GET',
+                            success: function (data) {
+                                console.log(data)
+                                console.log("success")
+                            }
+                        });
+                    });
+
+                    fetch('../../../static/js/atlas.json')
+                        .then((res) => res.json())
+                        .then((data) => {
+                            // console.log(data);
+                            //深度优先遍历树数据从根节点到叶子节点的由上至下的深度优先遍历树数据。
+                            G6.Util.traverseTree(data, function (item) {
+                                item.id = data.id;
+                                // console.log(item)
+                                // item.name=data.name;
+                            });
+                            graph.data(data);
+                            graph.render();
+                            graph.fitView();
+                        });
+
+                    if (typeof window !== 'undefined')
+                        window.onresize = () => {
+                            if (!graph || graph.get('destroyed')) return;
+                            if (!container || !container.scrollWidth || !container.scrollHeight) return;
+                            graph.changeSize(container.scrollWidth, container.scrollHeight);
+                        };
+                </script>
+            </div>
+        </div>
+        <!-------分界线------->
+        <div class="expander" id="expander1"></div>
+    </div>
+
+<div id="topRows" class="topRows">
+    <div id="footer1" class="footer1">
+        <div class="container">
+            <div class="left">
+                <div class="resize"></div>
+                <div class="bar-btn"></div>
+                <div class="content">
+                    <table class="multi-table" border="1 solid" cellspacing="0" cellpadding="7" align="center" text-align="center">
+                        <caption style="font-size:20px; letter-spacing:3px; margin:20px; font-weight:bold;">建设清单</caption>
+                        <thead>
+                        <tr>
+                            <th style="margin-left:20px"><input id='js-all-checkbox' type='checkbox' onclick='checkAll(this)'></th>
+                            <th style="font-size:15px; font-weight: normal;">存放安装地点</th>
+                            <th style="font-size:15px; font-weight: normal;">一级</th>
+                            <th style="font-size:15px; font-weight: normal;">二级</th>
+                            <th style="font-size:15px; font-weight: normal;">资产编码</th>
+                            <th style="font-size:15px; font-weight: normal;">设备名称</th>
+                            <th style="font-size:15px; font-weight: normal;">同类型总数量</th>
+                            <th style="font-size:15px; font-weight: normal;">其他描述/取值范围</th>
+                            <th style="font-size:15px; font-weight: normal;">单位</th>
+                            <th style="font-size:15px; font-weight: normal;">原值</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="right" style="background-color:white">
+                <table class="multi-table" border="1" cellspacing="0" cellpadding="7" align="center" text-align="center">
+                    <caption style="font-size:20px; letter-spacing:3px; margin:20px; font-weight:bold;">资产清单</caption>
+                    <thead>
+                    <tr>
+                        <th style="font-size:15px; font-weight: normal;">资产编码</th>
+                        <th style="font-size:15px; font-weight: normal;">设备名称</th>
+                        <th style="font-size:15px; font-weight: normal;">同类型总数量</th>
+                        <th style="font-size:15px; font-weight: normal;">其他描述/取值范围</th>
+                        <th style="font-size:15px; font-weight: normal;">存放安装地点</th>
+                        <th style="font-size:15px; font-weight: normal;">一级</th>
+                        <th style="font-size:15px; font-weight: normal;">二级</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody1"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-------分界线------->
+    <div class="expander" id="expander"></div>
+</div>
+
+<div id="bottomRows" class="bottomRows">
+    <div class="container">
+        <div id="main">
+            <div class="demo">
+                <div>
+                    <img id="img" src="/static/img/201中心站1.jpg" class="pin img" easypin-id="image_1"/>
+                </div>
+                <div style="display:none;" easypin-tpl>
+                    <popover>
+                        <div class="Container">
+                            <div class="popBackground borderRadius"></div>
+                            <div class="popBody">
+                                <div class="arrow-down" style="top: 185px;left: -19px;"></div>
+                                <div class="font1">
+                                    <h1>{[设备名称]}</h1>
+                                </div>
+                                <div class="popHeadLine"></div>
+                                <div class="popContent">
+                                    <label class="popfont">资产编码：</label><br>
+                                    <input id="asset_code" type="text" class="popInput" value="{[资产编码]}" readonly/>
+                                    <br>
+
+                                    <label class="popfont">设备名称：</label><br>
+                                    <input id="name" type="text" class="popInput" value="{[设备名称]}"/>
+                                    <br>
+
+                                    <label class="popfont">位置：</label><br>
+                                    <label class="popfont" style="left: 25px">经度：</label>
+                                    <input id="lng" type="text" class="popInput1" value="{[longitude]}"/>
+                                    <br><label class="popfont" style="left: 25px">纬度：</label>
+                                    <input id="lat" type="text" class="popInput1" value="{[latitude]}"/>
+                                    <br>
+
+                                    <label class="popfont">同类型总数量：</label>
+                                    <input id="num" type="text" class="popInput1" value="{[同类型总数量]}" style="position: relative;right: 25px;width: 50px">
+                                    <br>
+
+                                    <label class="popfont">存放安装地点：</label><br>
+                                    <input id="storeadd" type="text" class="popInput" value="{[存放安装地点]}"/>
+                                    <br>
+
+                                    <label class="popfont">其他描述/取值范围：</label><br>
+                                    <textarea id="description" type="text" class="popInput2">{[其他描述/取值范围]}</textarea>
+                                    <br>
+                                    <div>
+                                        <input id="changeInfo" type="button" onclick="changeInfo(this)" class="btn" value="修改"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </popover>
+
+                    <marker>
+                        <div class="marker">&nbsp;&nbsp;</div>
+                    </marker>
+                </div>
+            </div>
+        </div>
+        <script src="/static/js/easy_pin/jquery.easing.min.js"></script>
+        <script src="/static/js/easy_pin/jquery.easypin.min.js"></script>
+        <script src="/static/js/picmark1.js"></script>
+        <script src="/static/js/changeinfo.js"></script>
+    </div>
+</div>
+<script src="/static/js/drag.js"></script>
+</body>
+</html>
